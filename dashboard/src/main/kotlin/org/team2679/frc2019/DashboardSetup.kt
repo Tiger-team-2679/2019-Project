@@ -7,7 +7,7 @@ enum class DashboardSetup{
     INSTANCE;
 
     fun init(){
-        Dashboard.INSTANCE.init(3000)
+        Dashboard.INSTANCE.init(2679)
         Dashboard.INSTANCE.registerView(Index())
         Logger.INSTANCE.logINFO("started Dashboard", "Robot")
     }

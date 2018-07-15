@@ -9,11 +9,31 @@ def coroutineVersion = "0.23.4"
 apply plugin: 'java'
 apply plugin: 'idea'
 
-sourceCompatibility = 1.8
-
 kotlin {
     experimental {
         coroutines 'enable'
+    }
+
+}
+
+sourceCompatibility = 1.8
+
+def TEAM = 2679
+def ROBOT_CLASS = "org.team2679.framework.Robot"
+
+deploy {
+    targets {
+        target('roborio', jaci.openrio.gradle.frc.RoboRIO) {
+            team = TEAM
+        }
+    }
+    artifacts {
+        artifacts {
+            artifact('Kotlin', jaci.openrio.gradle.frc.FRCJavaArtifact) {
+                targets << "roborio"
+                jar = 'jar'
+            }
+        }
     }
 }
 
@@ -27,12 +47,17 @@ dependencies {
     compile navx()
     compile ctre()
 
-    compile project(":dashboard")
-
-    compile 'com.github.Tiger-team-2679:FRC-Framework:v1.0.0'
+    compile project(':dashboard')
     compile 'com.github.Tiger-team-2679:FRC-Logger:v1.0.0'
+    compile 'com.github.Tiger-team-2679:FRC-Framework:v1.1.0'
+    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.14'
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
-    compile group: 'org.reflections', name: 'reflections', version: '0.9.10'
+}
+
+// GradleRIO setup.  Must be after dependencies
+jar {
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    manifest jaci.openrio.gradle.GradleRIOPlugin.javaManifest(ROBOT_CLASS)
 }

@@ -3,6 +3,7 @@ package org.team2679.frc2019.Subsystems
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
 import edu.wpi.first.wpilibj.SpeedControllerGroup
 import edu.wpi.first.wpilibj.drive.DifferentialDrive
+import org.team2679.dashboard.Dashboard
 import org.team2679.framework.states.Machine
 import org.team2679.framework.states.machine
 import org.team2679.framework.subsystems.Subsystem
@@ -32,33 +33,38 @@ object Drive : Subsystem() {
     override var machine: Machine = machine(States.OpenLoop) {
         whenState(States.OpenLoop) {
             execute {
-                outputToSmartDashboard()
+                Logger.INSTANCE.logINFO("Open loop state started", "robot", "subsystem","drive")
             }
             repeat {
+                outputToSmartDashboard()
                 driveTrain.arcadeDrive(-ControlPanel.joystick.getAxis(1), ControlPanel.joystick.getAxis(0))
             }
         }
 
         whenState(States.ReverseOpenLoop) {
             execute {
-                outputToSmartDashboard()
+                Logger.INSTANCE.logINFO("Reverse open loop state started", "robot", "subsystem","drive")
             }
             repeat {
+                outputToSmartDashboard()
                 driveTrain.arcadeDrive(ControlPanel.joystick.getAxis(1), ControlPanel.joystick.getAxis(0))
             }
         }
         whenState(States.Stop) {
             execute {
+                Logger.INSTANCE.logINFO("stop state started", "robot", "subsystem","drive")
             }
             repeat {
+                outputToSmartDashboard()
                 driveTrain.arcadeDrive(0.0, 0.0)
             }
         }
         whenState(States.KidMode) {
             execute {
-                outputToSmartDashboard()
+                Logger.INSTANCE.logINFO("kidmode state started", "robot", "subsystem","drive")
             }
             repeat {
+                outputToSmartDashboard()
                 driveTrain.arcadeDrive(-ControlPanel.joystick.getAxis(1)*0.5, ControlPanel.joystick.getAxis(0)*0.5)
             }
         }
@@ -69,6 +75,8 @@ object Drive : Subsystem() {
     }
 
     override fun outputToSmartDashboard() {
+        Dashboard.INSTANCE.putDouble("Drive X Value", ControlPanel.joystick.getAxis(0));
+        Dashboard.INSTANCE.putDouble("Drive Y Value", ControlPanel.joystick.getAxis(1));
     }
 
     override fun zeroSensors() {
