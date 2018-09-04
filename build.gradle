@@ -1,0 +1,65 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.2.51"
+    id "edu.wpi.first.GradleRIO" version "2018.06.21"
+}
+
+def kotlinVersion = '1.2.51'
+def coroutineVersion = "0.23.4"
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+kotlin {
+    experimental {
+        coroutines 'enable'
+    }
+
+}
+
+sourceCompatibility = 1.8
+
+def TEAM = 2679
+
+deploy {
+    targets {
+        target("roborio", edu.wpi.first.gradlerio.frc.RoboRIO) {
+            // Team can be overridden by command line, for use with VSCode
+            team = getTeamOrDefault(TEAM)
+        }
+    }
+    artifacts {
+        // We still use FRCJavaArtifact since kotlin does respond as a Java build.
+        artifact('frcKotlin', edu.wpi.first.gradlerio.frc.FRCJavaArtifact) {
+            targets << "roborio"
+            // Debug can be overridden by command line, for use with VSCode
+            debug = getDebugOrDefault(false)
+        }
+    }
+}
+
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile wpilib()
+    compile navx()
+    compile ctre()
+
+
+    implementation 'com.github.Tiger-team-2679:FRC-Framework:2018.09.04'
+    implementation 'com.github.Tiger-team-2679:FRC-Logger:2018.09.04'
+    implementation 'com.github.Tiger-team-2679:FRC-Web-Dashboard:2018.09.04'
+
+    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.14'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
+}
+
+// GradleRIO setup.  Must be after dependencies
+jar {
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest("org.team2679.framework.Robot")
+}
